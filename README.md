@@ -12,6 +12,10 @@ A **dynamic, single-page web application** to efficiently track and manage your 
 ![Screenshot](gcp.png)
 
 ---
+
+![Screenshot](sheet.png)
+
+---
 ## 🚀 Features
 
 - **Google Sheets Backend:** Use a live, free, and easy-to-manage Google Sheet as your database.
