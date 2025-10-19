@@ -469,7 +469,33 @@
                     || rowIndex.includes(searchTerm);
             });
 
-            filteredJobs.sort((a, b) => new Date(b[2]) - new Date(a[2]));
+            // Sort by updated date (col 5 / index 5) desc, then application date (col 2), then row index
+            filteredJobs.sort((a, b) => {
+                const updatedA = a[5] ? new Date(a[5]) : null;
+                const updatedB = b[5] ? new Date(b[5]) : null;
+                if (updatedA && updatedB) {
+                    if (updatedB - updatedA !== 0) return updatedB - updatedA;
+                } else if (updatedA && !updatedB) {
+                    return -1; // a is newer
+                } else if (!updatedA && updatedB) {
+                    return 1; // b is newer
+                }
+
+                const appliedA = a[2] ? new Date(a[2]) : null;
+                const appliedB = b[2] ? new Date(b[2]) : null;
+                if (appliedA && appliedB) {
+                    if (appliedB - appliedA !== 0) return appliedB - appliedA;
+                } else if (appliedA && !appliedB) {
+                    return -1;
+                } else if (!appliedA && appliedB) {
+                    return 1;
+                }
+
+                // Finally, fallback to sheet row index (higher index is newer entry)
+                const rowIndexA = parseInt(a[6]) || 0;
+                const rowIndexB = parseInt(b[6]) || 0;
+                return rowIndexB - rowIndexA;
+            });
             
             jobsListContainer.innerHTML = '';
 
