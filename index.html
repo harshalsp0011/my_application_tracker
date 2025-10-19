@@ -214,6 +214,15 @@
                 max-height: calc(65vh - 2rem);
             }
         }
+        /* Paper card for the rest of the components to visually separate from Add New Application */
+        .other-components-card {
+            background: linear-gradient(180deg, #ffffff 0%, #ffffff 100%);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            box-shadow: 0 8px 28px rgba(15,23,42,0.04);
+            border: 1px solid #eef2ff;
+            margin-top: 0.75rem;
+        }
     </style>
 </head>
 <body class="p-4 md:p-6">
@@ -259,7 +268,7 @@
                                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                     <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M2 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 002 2H4a2 2 0 01-2-2V5zm3 1a1 1 0 000 2h.01a1 1 0 100-2H5zm2 0a1 1 0 000 2h3a1 1 0 100-2H7z" clip-rule="evenodd" /></svg>
                                 </div>
-                                <input type="text" id="jobName" list="jobNameList" required class="pl-10">
+                                <input type="text" id="jobName" required class="pl-10" autocomplete="off">
                                 <datalist id="jobNameList"></datalist>
                                 <div class="autocomplete-suggestions" id="jobName-suggestions" style="display:none"></div>
                             </div>
@@ -270,8 +279,9 @@
                                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                     <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" /><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm3 0a1 1 0 011-1h1a1 1 0 110 2H8a1 1 0 01-1-1z" clip-rule="evenodd" /></svg>
                                 </div>
-                                <input type="text" id="jobCompany" list="companyList" required class="pl-10">
+                                <input type="text" id="jobCompany" required class="pl-10" autocomplete="off">
                                 <datalist id="companyList"></datalist>
+                                <div class="autocomplete-suggestions" id="company-suggestions" style="display:none"></div>
                                     <div class="autocomplete-suggestions" id="company-suggestions" style="display:none"></div>
                             </div>
                         </div>
@@ -290,8 +300,9 @@
                                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                     <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>
                                 </div>
-                                <input type="text" id="jobPortal" list="portalList" placeholder="e.g., LinkedIn" required class="pl-10">
+                                <input type="text" id="jobPortal" placeholder="e.g., LinkedIn" required class="pl-10" autocomplete="off">
                                 <datalist id="portalList"></datalist>
+                                <div class="autocomplete-suggestions" id="portal-suggestions" style="display:none"></div>
                                     <div class="autocomplete-suggestions" id="portal-suggestions" style="display:none"></div>
                             </div>
                         </div>
@@ -314,7 +325,8 @@
                 </form>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="card other-components-card">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-1">
                     <div class="card h-full space-y-6">
                         <div>
@@ -329,6 +341,7 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
                 <div class="lg:col-span-2 card">
                     <div class="mb-2">
