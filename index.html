@@ -448,12 +448,25 @@
         }
 
         function renderJobs() {
-            const searchTerm = searchBar.value.toLowerCase();
+            const searchTerm = (searchBar.value || '').toLowerCase().trim();
             const filteredJobs = allJobsData.filter(row => {
+                if (!searchTerm) return true; // no filter
                 const jobName = (row[0] || '').toLowerCase();
                 const company = (row[1] || '').toLowerCase();
+                const appliedDate = (row[2] || '').toLowerCase();
                 const portal = (row[3] || '').toLowerCase();
-                return jobName.includes(searchTerm) || company.includes(searchTerm) || portal.includes(searchTerm);
+                const status = (row[4] || '').toLowerCase();
+                const updatedDate = (row[5] || '').toLowerCase();
+                const rowIndex = String(row[6] || '').toLowerCase();
+
+                // match if any field contains the search term
+                return jobName.includes(searchTerm)
+                    || company.includes(searchTerm)
+                    || appliedDate.includes(searchTerm)
+                    || portal.includes(searchTerm)
+                    || status.includes(searchTerm)
+                    || updatedDate.includes(searchTerm)
+                    || rowIndex.includes(searchTerm);
             });
 
             filteredJobs.sort((a, b) => new Date(b[2]) - new Date(a[2]));
