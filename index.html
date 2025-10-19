@@ -120,7 +120,8 @@
         }
         /* Make the jobs list scrollable when it grows too tall */
         #jobs-list-container {
-            max-height: 56vh; /* keep it relative to viewport height so it fits on screen */
+            /* increase the visible area to reduce blank space below */
+            max-height: calc(72vh - 2rem); /* leave a little room for header/footer and padding */
             overflow-y: auto;
             -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
             padding-right: 0.25rem; /* small padding to avoid content touching the scrollbar */
@@ -128,6 +129,13 @@
         /* Improve spacing for each job card inside the scrollable area */
         #jobs-list-container > div {
             margin-bottom: 0.5rem;
+        }
+
+        /* Responsive adjustments: smaller max-height on very small screens */
+        @media (max-width: 640px) {
+            #jobs-list-container {
+                max-height: calc(65vh - 2rem);
+            }
         }
     </style>
 </head>
