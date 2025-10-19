@@ -101,6 +101,37 @@
         @media (max-width: 768px) {
             .add-job-card { padding: 1rem; }
         }
+        /* Inputs and buttons subtle hover/transition */
+        input, select, .btn { transition: all 0.18s ease; }
+        input:hover, select:hover { transform: translateY(-1px); }
+        input:focus { box-shadow: 0 6px 18px rgba(79,70,229,0.08); }
+        .btn:hover { transform: translateY(-2px); }
+
+        /* Autocomplete dropdown */
+        .autocomplete-suggestions {
+            position: absolute;
+            z-index: 40;
+            background: white;
+            border: 1px solid #e6e9f8;
+            box-shadow: 0 6px 18px rgba(16,24,40,0.06);
+            border-radius: 0.5rem;
+            width: 100%;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+        .autocomplete-item {
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: #374151;
+        }
+        .autocomplete-item:hover, .autocomplete-item.active {
+            background: #f3f4f6;
+        }
+
+        /* Collapse/expand form */
+        .add-job-card .form-collapsed { max-height: 0; opacity: 0; overflow: hidden; transition: max-height 0.28s ease, opacity 0.22s ease; }
+        .add-job-card .form-expanded { max-height: 2000px; opacity: 1; transition: max-height 0.5s ease, opacity 0.25s ease; }
 
         input, select {
             width: 100%;
@@ -210,8 +241,17 @@
         <main id="main-content" style="display: none;" class="space-y-6">
             
             <div class="card add-job-card">
-                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Add New Application</h2>
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-2xl font-semibold text-gray-800">
+                        <svg class="inline h-6 w-6 mr-2 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m2 0a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2h14zM9 12V7a3 3 0 016 0v5"/></svg>
+                        Add New Application
+                    </h2>
+                    <div>
+                        <button id="toggle-form-btn" type="button" class="btn btn-outline btn-eq">Collapse</button>
+                    </div>
+                </div>
                 <form id="add-job-form">
+                    <div id="add-job-form-body" class="form-expanded">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="jobName" class="block text-sm font-medium text-gray-700 mb-1">Job Name</label>
@@ -221,6 +261,7 @@
                                 </div>
                                 <input type="text" id="jobName" list="jobNameList" required class="pl-10">
                                 <datalist id="jobNameList"></datalist>
+                                <div class="autocomplete-suggestions" id="jobName-suggestions" style="display:none"></div>
                             </div>
                         </div>
                         <div>
@@ -231,6 +272,7 @@
                                 </div>
                                 <input type="text" id="jobCompany" list="companyList" required class="pl-10">
                                 <datalist id="companyList"></datalist>
+                                    <div class="autocomplete-suggestions" id="company-suggestions" style="display:none"></div>
                             </div>
                         </div>
                         <div>
@@ -250,6 +292,7 @@
                                 </div>
                                 <input type="text" id="jobPortal" list="portalList" placeholder="e.g., LinkedIn" required class="pl-10">
                                 <datalist id="portalList"></datalist>
+                                    <div class="autocomplete-suggestions" id="portal-suggestions" style="display:none"></div>
                             </div>
                         </div>
                         <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
@@ -543,6 +586,75 @@
                 const o = document.createElement('option'); o.value = p; portalList.appendChild(o);
             });
         }
+
+        // Simple autocomplete using datalist values as source
+        function setupAutocomplete(inputId, datalistId, suggestionsId) {
+            const input = document.getElementById(inputId);
+            const datalist = document.getElementById(datalistId);
+            const suggestions = document.getElementById(suggestionsId);
+
+            const updateSuggestions = () => {
+                const val = input.value.toLowerCase();
+                const options = Array.from(datalist.options || []).map(o => o.value).filter(v => v && v.toLowerCase().includes(val));
+                suggestions.innerHTML = '';
+                if (!options.length || !val) { suggestions.style.display = 'none'; return; }
+                options.slice(0, 8).forEach(opt => {
+                    const div = document.createElement('div');
+                    div.className = 'autocomplete-item';
+                    div.textContent = opt;
+                    div.addEventListener('click', () => { input.value = opt; suggestions.style.display = 'none'; });
+                    suggestions.appendChild(div);
+                });
+                suggestions.style.display = 'block';
+            };
+
+            input.addEventListener('input', updateSuggestions);
+            input.addEventListener('blur', () => { setTimeout(() => suggestions.style.display = 'none', 150); });
+            input.addEventListener('focus', updateSuggestions);
+            input.addEventListener('keydown', (e) => {
+                const items = suggestions.querySelectorAll('.autocomplete-item');
+                if (!items.length) return;
+                const active = suggestions.querySelector('.autocomplete-item.active');
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (!active) { items[0].classList.add('active'); return; }
+                    const next = active.nextSibling || items[0]; active.classList.remove('active'); next.classList.add('active');
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (!active) { items[items.length-1].classList.add('active'); return; }
+                    const prev = active.previousSibling || items[items.length-1]; active.classList.remove('active'); prev.classList.add('active');
+                } else if (e.key === 'Enter') {
+                    if (active) { e.preventDefault(); input.value = active.textContent; suggestions.style.display = 'none'; }
+                }
+            });
+        }
+
+        // Toggle collapse/expand of the Add Job form
+        document.getElementById('toggle-form-btn').addEventListener('click', () => {
+            const body = document.getElementById('add-job-form-body');
+            const btn = document.getElementById('toggle-form-btn');
+            if (body.classList.contains('form-expanded')) {
+                body.classList.remove('form-expanded');
+                body.classList.add('form-collapsed');
+                btn.textContent = 'Expand';
+            } else {
+                body.classList.remove('form-collapsed');
+                body.classList.add('form-expanded');
+                btn.textContent = 'Collapse';
+            }
+        });
+
+        // Initialize autocompletes after datalists are populated
+        const initAutocompletes = () => {
+            setupAutocomplete('jobName', 'jobNameList', 'jobName-suggestions');
+            setupAutocomplete('jobCompany', 'companyList', 'company-suggestions');
+            setupAutocomplete('jobPortal', 'portalList', 'portal-suggestions');
+        };
+
+        // Ensure autocompletes are bound after DOM is ready
+        window.addEventListener('load', () => {
+            initAutocompletes();
+        });
 
         function renderJobs() {
             const searchTerm = (searchBar.value || '').toLowerCase().trim();
