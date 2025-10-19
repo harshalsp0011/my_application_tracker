@@ -70,6 +70,8 @@
             background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
             border: 1px solid rgba(99,102,241,0.06);
             padding: 1.25rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 12px 30px rgba(15,23,42,0.06);
         }
         .add-job-card h2 {
             display: inline-block;
@@ -214,6 +216,12 @@
                 max-height: calc(65vh - 2rem);
             }
         }
+        /* Wider layout: make left stats column narrow and right column flexible */
+        @media (min-width: 1024px) {
+            .components-grid {
+                grid-template-columns: 360px 1fr;
+            }
+        }
         
     </style>
 </head>
@@ -274,7 +282,6 @@
                                 <input type="text" id="jobCompany" required class="pl-10" autocomplete="off">
                                 <datalist id="companyList"></datalist>
                                 <div class="autocomplete-suggestions" id="company-suggestions" style="display:none"></div>
-                                    <div class="autocomplete-suggestions" id="company-suggestions" style="display:none"></div>
                             </div>
                         </div>
                         <div>
@@ -295,7 +302,6 @@
                                 <input type="text" id="jobPortal" placeholder="e.g., LinkedIn" required class="pl-10" autocomplete="off">
                                 <datalist id="portalList"></datalist>
                                 <div class="autocomplete-suggestions" id="portal-suggestions" style="display:none"></div>
-                                    <div class="autocomplete-suggestions" id="portal-suggestions" style="display:none"></div>
                             </div>
                         </div>
                         <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
@@ -317,7 +323,7 @@
                 </form>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 components-grid">
                 <div class="lg:col-span-1">
                     <div class="card h-full space-y-6">
                         <div>
