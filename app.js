@@ -22,7 +22,7 @@ const userPhotoImg = document.getElementById('user-photo');
 let gapiInited = false;
 let gisInited = false;
 let tokenClient;
-let portalChart, timelineChart;
+let timelineChart;
 let rowToDelete = null;
 let allJobsData = [];
 
@@ -451,33 +451,6 @@ function updateCharts(jobs) {
             <p class="text-2xl font-bold text-red-600">${rejected}</p>
         </div>
     `;
-
-    // Render Portal Chart
-    const portalLabels = Object.keys(portalCounts);
-    const portalValues = Object.values(portalCounts);
-
-    if (portalChart) portalChart.destroy();
-    const ctxPortal = document.getElementById('portalChart').getContext('2d');
-    portalChart = new Chart(ctxPortal, {
-        type: 'doughnut',
-        data: {
-            labels: portalLabels,
-            datasets: [{
-                data: portalValues,
-                backgroundColor: [
-                    '#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#6366f1'
-                ],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } }
-            },
-            cutout: '65%'
-        }
-    });
 
     // Render Timeline Chart - Comprehensive view with all statuses
     const dailyByStatus = {};
