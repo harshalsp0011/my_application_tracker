@@ -15,8 +15,6 @@ const searchBar = document.getElementById('search-bar');
 const deleteModal = document.getElementById('delete-modal');
 const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
 const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-const cumulativeToggle = document.getElementById('cumulative-toggle');
-const timelineFiltersContainer = document.getElementById('timeline-filters');
 const userProfileDiv = document.getElementById('user-profile');
 const userNameP = document.getElementById('user-name');
 const userPhotoImg = document.getElementById('user-photo');
@@ -27,8 +25,6 @@ let tokenClient;
 let portalChart, timelineChart;
 let rowToDelete = null;
 let allJobsData = [];
-let timelineFilter = 'all';
-let isCumulative = false;
 
 
 function gisLoaded() {
@@ -402,33 +398,12 @@ function renderListView(jobs) {
 
 function updateCharts(jobs) {
     const portalCounts = {};
-    const timelineData = {};
     const now = new Date();
-
-    // Filter logic for timeline
-    let cutoffDate = null;
-    if (timelineFilter === '30') {
-        cutoffDate = new Date();
-        cutoffDate.setDate(now.getDate() - 30);
-    } else if (timelineFilter === '90') {
-        cutoffDate = new Date();
-        cutoffDate.setDate(now.getDate() - 90);
-    }
 
     jobs.forEach(job => {
         // Portal Stats
         const portal = job[3] || 'Unknown';
         portalCounts[portal] = (portalCounts[portal] || 0) + 1;
-
-        // Timeline Stats
-        const dateStr = job[2];
-        if (dateStr) {
-            const d = new Date(dateStr);
-            if (!cutoffDate || d >= cutoffDate) {
-                const key = d.toISOString().split('T')[0]; // YYYY-MM-DD
-                timelineData[key] = (timelineData[key] || 0) + 1;
-            }
-        }
     });
 
     // Render Stats Cards
@@ -504,71 +479,30 @@ function updateCharts(jobs) {
         }
     });
 
-    // Render Timeline Chart
-    const sortedDates = Object.keys(timelineData).sort();
-    let timelineValues = sortedDates.map(d => timelineData[d]);
-
-    if (isCumulative) {
-        let sum = 0;
-        timelineValues = timelineValues.map(v => { sum += v; return sum; });
-    }
-
-    if (timelineChart) timelineChart.destroy();
-    const ctxTimeline = document.getElementById('timelineChart').getContext('2d');
-    timelineChart = new Chart(ctxTimeline, {
-        type: 'line',
-        data: {
-            labels: sortedDates,
-            datasets: [{
-                label: 'Applications',
-                data: timelineValues,
-                borderColor: '#4f46e5',
-                backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                fill: true,
-                tension: 0.3,
-                pointRadius: 3,
-                pointHoverRadius: 5
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                x: { grid: { display: false }, ticks: { maxTicksLimit: 8 } },
-                y: { beginAtZero: true, grid: { borderDash: [4, 4] } }
-            },
-            plugins: {
-                legend: { display: false }
-            }
-        }
-    });
-
-    // Render Daily Analytics Chart (by status)
+    // Render Timeline Chart - Comprehensive view with all statuses
     const dailyByStatus = {};
     const dailyCumulative = {};
-    let cumulativeSum = 0;
 
     jobs.forEach(job => {
         const dateStr = job[2];
         if (dateStr) {
             const d = new Date(dateStr);
-            if (!cutoffDate || d >= cutoffDate) {
-                const key = d.toISOString().split('T')[0]; // YYYY-MM-DD
-                const status = job[4] || 'Unknown';
-                
-                // Count by status per day
-                if (!dailyByStatus[key]) dailyByStatus[key] = {};
-                dailyByStatus[key][status] = (dailyByStatus[key][status] || 0) + 1;
+            const key = d.toISOString().split('T')[0]; // YYYY-MM-DD
+            const status = job[4] || 'Unknown';
+            
+            // Count by status per day
+            if (!dailyByStatus[key]) dailyByStatus[key] = {};
+            dailyByStatus[key][status] = (dailyByStatus[key][status] || 0) + 1;
 
-                // Count cumulative
-                dailyCumulative[key] = (dailyCumulative[key] || 0) + 1;
-            }
+            // Count cumulative
+            dailyCumulative[key] = (dailyCumulative[key] || 0) + 1;
         }
     });
 
     // Sort dates and prepare cumulative data
-    const dailySortedDates = Object.keys(dailyByStatus).sort();
+    const sortedDates = Object.keys(dailyByStatus).sort();
     let cumulativeTotal = 0;
-    const dailyCumulativeValues = dailySortedDates.map(d => {
+    const cumulativeValues = sortedDates.map(d => {
         cumulativeTotal += dailyCumulative[d] || 0;
         return cumulativeTotal;
     });
@@ -583,75 +517,77 @@ function updateCharts(jobs) {
         'Unknown': '#6b7280'
     };
 
-    const datasets = statuses.map(status => ({
+    const statusDatasets = statuses.map(status => ({
         label: status,
-        data: dailySortedDates.map(d => dailyByStatus[d][status] || 0),
+        data: sortedDates.map(d => dailyByStatus[d][status] || 0),
         backgroundColor: statusColors[status],
         borderWidth: 0
     }));
 
     // Add cumulative line dataset
-    datasets.push({
-        label: 'Cumulative',
-        data: dailyCumulativeValues,
+    statusDatasets.push({
+        label: 'Cumulative Total',
+        data: cumulativeValues,
         borderColor: '#7c3aed',
         backgroundColor: 'rgba(124, 58, 237, 0.1)',
         fill: false,
-        tension: 0.3,
+        tension: 0.4,
         borderWidth: 3,
-        pointRadius: 4,
-        pointHoverRadius: 6,
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        pointBackgroundColor: '#7c3aed',
         yAxisID: 'y1',
         type: 'line'
     });
 
-    let dailyAnalyticsChart = window.dailyAnalyticsChart;
-    if (dailyAnalyticsChart) dailyAnalyticsChart.destroy();
-    
-    const ctxDaily = document.getElementById('dailyAnalyticsChart').getContext('2d');
-    window.dailyAnalyticsChart = new Chart(ctxDaily, {
+    if (timelineChart) timelineChart.destroy();
+    const ctxTimeline = document.getElementById('timelineChart').getContext('2d');
+    timelineChart = new Chart(ctxTimeline, {
         type: 'bar',
         data: {
-            labels: dailySortedDates,
-            datasets: datasets
+            labels: sortedDates,
+            datasets: statusDatasets
         },
         options: {
             responsive: true,
+            interaction: { mode: 'index', intersect: false },
             scales: {
-                x: { grid: { display: false }, stacked: true, ticks: { maxTicksLimit: 10 } },
-                y: { beginAtZero: true, stacked: true, grid: { borderDash: [4, 4] } },
+                x: { 
+                    grid: { display: false }, 
+                    stacked: true,
+                    ticks: { maxTicksLimit: 15 } 
+                },
+                y: { 
+                    beginAtZero: true, 
+                    stacked: true, 
+                    grid: { borderDash: [4, 4] },
+                    title: { display: true, text: 'Count by Status' }
+                },
                 y1: {
                     type: 'linear',
                     position: 'right',
+                    beginAtZero: true,
                     grid: { display: false },
-                    title: { display: true, text: 'Cumulative' }
+                    title: { display: true, text: 'Cumulative Total' },
+                    ticks: { color: '#7c3aed' }
                 }
             },
             plugins: {
-                legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }
+                legend: { 
+                    position: 'top', 
+                    labels: { boxWidth: 15, padding: 15, font: { size: 12 } }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                }
             }
         }
     });
 }
 
 
-// Event Listeners for Filters
-cumulativeToggle.addEventListener('change', (e) => {
-    isCumulative = e.target.checked;
-    renderJobs(); // re-render to update charts
-});
-
-timelineFiltersContainer.querySelectorAll('.timeline-filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        timelineFiltersContainer.querySelectorAll('.timeline-filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        timelineFilter = btn.getAttribute('data-range');
-        renderJobs();
-    });
-});
-
-
-// Add Job Form Submit
+// Event Listeners for Form
 addJobForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const jobName = document.getElementById('jobName').value;
