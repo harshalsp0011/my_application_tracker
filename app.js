@@ -228,46 +228,6 @@ document.getElementById('toggle-form-btn').addEventListener('click', () => {
     }
 });
 
-// Dark Mode Logic
-const themeToggleBtn = document.getElementById('theme-toggle');
-const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
-const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
-
-// Change the icons inside the button based on previous settings
-if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    themeToggleLightIcon.classList.remove('hidden');
-    document.documentElement.classList.add('dark');
-} else {
-    themeToggleDarkIcon.classList.remove('hidden');
-    document.documentElement.classList.remove('dark');
-}
-
-themeToggleBtn.addEventListener('click', function () {
-    // toggle icons inside button
-    themeToggleDarkIcon.classList.toggle('hidden');
-    themeToggleLightIcon.classList.toggle('hidden');
-
-    // if set via local storage previously
-    if (localStorage.getItem('color-theme')) {
-        if (localStorage.getItem('color-theme') === 'light') {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('color-theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('color-theme', 'light');
-        }
-    } else {
-        // if NOT set via local storage previously
-        if (document.documentElement.classList.contains('dark')) {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('color-theme', 'light');
-        } else {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('color-theme', 'dark');
-        }
-    }
-});
-
 // Initialize autocompletes after datalists are populated
 const initAutocompletes = () => {
     setupAutocomplete('jobName', 'jobNameList', 'jobName-suggestions');
@@ -278,31 +238,6 @@ const initAutocompletes = () => {
 // Ensure autocompletes are bound after DOM is ready
 window.addEventListener('load', () => {
     initAutocompletes();
-});
-
-// View Toggle Logic
-const viewListBtn = document.getElementById('view-list-btn');
-const viewKanbanBtn = document.getElementById('view-kanban-btn');
-let currentView = 'list'; // 'list' or 'kanban'
-
-viewListBtn.addEventListener('click', () => {
-    if (currentView === 'list') return;
-    currentView = 'list';
-    viewListBtn.classList.add('bg-white', 'shadow-sm', 'text-gray-800');
-    viewListBtn.classList.remove('text-gray-500', 'hover:text-gray-800');
-    viewKanbanBtn.classList.remove('bg-white', 'shadow-sm', 'text-gray-800');
-    viewKanbanBtn.classList.add('text-gray-500', 'hover:text-gray-800');
-    renderJobs();
-});
-
-viewKanbanBtn.addEventListener('click', () => {
-    if (currentView === 'kanban') return;
-    currentView = 'kanban';
-    viewKanbanBtn.classList.add('bg-white', 'shadow-sm', 'text-gray-800');
-    viewKanbanBtn.classList.remove('text-gray-500', 'hover:text-gray-800');
-    viewListBtn.classList.remove('bg-white', 'shadow-sm', 'text-gray-800');
-    viewListBtn.classList.add('text-gray-500', 'hover:text-gray-800');
-    renderJobs();
 });
 
 function renderJobs() {
@@ -357,11 +292,7 @@ function renderJobs() {
 
     jobsListContainer.innerHTML = '';
 
-    if (currentView === 'kanban') {
-        renderKanbanBoard(filteredJobs);
-    } else {
-        renderListView(filteredJobs);
-    }
+    renderListView(filteredJobs);
 
     updateCharts(filteredJobs);
     // store last filtered jobs for export convenience
@@ -467,88 +398,6 @@ function renderListView(jobs) {
     }
 }
 
-function renderKanbanBoard(jobs) {
-    const statuses = ['Applied', 'Interviewed', 'Offer', 'Rejected'];
-    const board = document.createElement('div');
-    board.className = 'kanban-board';
-
-    statuses.forEach(status => {
-        const column = document.createElement('div');
-        column.className = 'kanban-column';
-        column.dataset.status = status;
-
-        const columnJobs = jobs.filter(j => (j[4] || 'Applied') === status);
-
-        column.innerHTML = `
-            <div class="kanban-column-header">
-                <span>${status}</span>
-                <span class="kanban-column-count">${columnJobs.length}</span>
-            </div>
-            <div class="kanban-cards-container space-y-3 flex-1">
-                ${columnJobs.map(job => `
-                    <div class="kanban-card status-${status}" draggable="true" data-row-index="${job[6]}">
-                        <h4>${job[0]}</h4>
-                        <p>${job[1]}</p>
-                        <div class="meta">
-                            <span>${job[3]}</span>
-                            <span>${job[2]}</span>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-        board.appendChild(column);
-    });
-
-    jobsListContainer.appendChild(board);
-    setupDragAndDrop();
-}
-
-function setupDragAndDrop() {
-    const cards = document.querySelectorAll('.kanban-card');
-    const columns = document.querySelectorAll('.kanban-column');
-
-    cards.forEach(card => {
-        card.addEventListener('dragstart', () => {
-            card.classList.add('dragging');
-        });
-        card.addEventListener('dragend', () => {
-            card.classList.remove('dragging');
-        });
-    });
-
-    columns.forEach(column => {
-        column.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            column.classList.add('drag-over');
-        });
-
-        column.addEventListener('dragleave', () => {
-            column.classList.remove('drag-over');
-        });
-
-        column.addEventListener('drop', async (e) => {
-            e.preventDefault();
-            column.classList.remove('drag-over');
-            const card = document.querySelector('.dragging');
-            if (!card) return;
-
-            const newStatus = column.dataset.status;
-            const rowIndex = card.dataset.rowIndex;
-
-            // Optimistic UI update
-            const oldStatusClass = Array.from(card.classList).find(c => c.startsWith('status-'));
-            if (oldStatusClass) card.classList.remove(oldStatusClass);
-            card.classList.add(`status-${newStatus}`);
-            column.querySelector('.kanban-cards-container').appendChild(card);
-
-            // Update counts (simple re-render is easier but let's do optimistic first)
-            // Actually, re-rendering is safer to keep counts in sync
-
-            await updateJobStatus(rowIndex, newStatus);
-        });
-    });
-}
 
 
 function updateCharts(jobs) {
@@ -587,6 +436,7 @@ function updateCharts(jobs) {
     const activeApps = jobs.filter(j => j[4] !== 'Rejected').length;
     const interviews = jobs.filter(j => j[4] === 'Interviewed').length;
     const offers = jobs.filter(j => j[4] === 'Offer').length;
+    const rejected = jobs.filter(j => j[4] === 'Rejected').length;
 
     const statsContainer = document.getElementById('stats-container');
     statsContainer.innerHTML = `
@@ -605,6 +455,10 @@ function updateCharts(jobs) {
         <div class="stat-card">
             <p class="text-gray-500 text-xs uppercase font-bold">Offers</p>
             <p class="text-2xl font-bold text-green-600">${offers}</p>
+        </div>
+        <div class="stat-card">
+            <p class="text-gray-500 text-xs uppercase font-bold">Rejected</p>
+            <p class="text-2xl font-bold text-red-600">${rejected}</p>
         </div>
     `;
 
