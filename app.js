@@ -513,9 +513,15 @@ function updateCharts(jobs) {
         type: 'line'
     });
 
+    // Check if canvas element exists before creating chart
+    const ctxTimeline = document.getElementById('timelineChart');
+    if (!ctxTimeline) {
+        console.error('timelineChart canvas element not found');
+        return;
+    }
+
     if (timelineChart) timelineChart.destroy();
-    const ctxTimeline = document.getElementById('timelineChart').getContext('2d');
-    timelineChart = new Chart(ctxTimeline, {
+    timelineChart = new Chart(ctxTimeline.getContext('2d'), {
         type: 'bar',
         data: {
             labels: sortedDates,
