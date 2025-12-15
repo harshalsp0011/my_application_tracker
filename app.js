@@ -541,6 +541,97 @@ function updateCharts(jobs) {
             }
         }
     });
+
+    // Render Daily Analytics Chart (by status)
+    const dailyByStatus = {};
+    const dailyCumulative = {};
+    let cumulativeSum = 0;
+
+    jobs.forEach(job => {
+        const dateStr = job[2];
+        if (dateStr) {
+            const d = new Date(dateStr);
+            if (!cutoffDate || d >= cutoffDate) {
+                const key = d.toISOString().split('T')[0]; // YYYY-MM-DD
+                const status = job[4] || 'Unknown';
+                
+                // Count by status per day
+                if (!dailyByStatus[key]) dailyByStatus[key] = {};
+                dailyByStatus[key][status] = (dailyByStatus[key][status] || 0) + 1;
+
+                // Count cumulative
+                dailyCumulative[key] = (dailyCumulative[key] || 0) + 1;
+            }
+        }
+    });
+
+    // Sort dates and prepare cumulative data
+    const dailySortedDates = Object.keys(dailyByStatus).sort();
+    let cumulativeTotal = 0;
+    const dailyCumulativeValues = dailySortedDates.map(d => {
+        cumulativeTotal += dailyCumulative[d] || 0;
+        return cumulativeTotal;
+    });
+
+    // Prepare stacked data by status
+    const statuses = ['Applied', 'Interviewed', 'Offer', 'Rejected'];
+    const statusColors = {
+        'Applied': '#3b82f6',
+        'Interviewed': '#f59e0b',
+        'Offer': '#10b981',
+        'Rejected': '#ef4444',
+        'Unknown': '#6b7280'
+    };
+
+    const datasets = statuses.map(status => ({
+        label: status,
+        data: dailySortedDates.map(d => dailyByStatus[d][status] || 0),
+        backgroundColor: statusColors[status],
+        borderWidth: 0
+    }));
+
+    // Add cumulative line dataset
+    datasets.push({
+        label: 'Cumulative',
+        data: dailyCumulativeValues,
+        borderColor: '#7c3aed',
+        backgroundColor: 'rgba(124, 58, 237, 0.1)',
+        fill: false,
+        tension: 0.3,
+        borderWidth: 3,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        yAxisID: 'y1',
+        type: 'line'
+    });
+
+    let dailyAnalyticsChart = window.dailyAnalyticsChart;
+    if (dailyAnalyticsChart) dailyAnalyticsChart.destroy();
+    
+    const ctxDaily = document.getElementById('dailyAnalyticsChart').getContext('2d');
+    window.dailyAnalyticsChart = new Chart(ctxDaily, {
+        type: 'bar',
+        data: {
+            labels: dailySortedDates,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: { grid: { display: false }, stacked: true, ticks: { maxTicksLimit: 10 } },
+                y: { beginAtZero: true, stacked: true, grid: { borderDash: [4, 4] } },
+                y1: {
+                    type: 'linear',
+                    position: 'right',
+                    grid: { display: false },
+                    title: { display: true, text: 'Cumulative' }
+                }
+            },
+            plugins: {
+                legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }
+            }
+        }
+    });
 }
 
 
