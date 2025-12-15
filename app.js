@@ -438,11 +438,26 @@ function updateCharts(jobs) {
     const offers = jobs.filter(j => j[4] === 'Offer').length;
     const rejected = jobs.filter(j => j[4] === 'Rejected').length;
 
+    // Calculate daily applications count
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    const todayApps = jobs.filter(j => {
+        const dateStr = j[2]; // Application date is at index 2
+        if (dateStr) {
+            const d = new Date(dateStr).toISOString().split('T')[0];
+            return d === today;
+        }
+        return false;
+    }).length;
+
     const statsContainer = document.getElementById('stats-container');
     statsContainer.innerHTML = `
         <div class="stat-card">
             <p class="text-gray-500 text-xs uppercase font-bold">Total</p>
             <p class="text-2xl font-bold text-gray-800">${totalApps}</p>
+        </div>
+        <div class="stat-card">
+            <p class="text-gray-500 text-xs uppercase font-bold">Today</p>
+            <p class="text-2xl font-bold text-purple-600">${todayApps}</p>
         </div>
         <div class="stat-card">
             <p class="text-gray-500 text-xs uppercase font-bold">Active</p>
