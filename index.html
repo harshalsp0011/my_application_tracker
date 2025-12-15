@@ -153,60 +153,57 @@
                 </form>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 components-grid">
-                <div class="lg:col-span-1">
-                    <div class="card h-full space-y-6">
-                        <div>
-                            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Statistics</h2>
-                            <div id="stats-container" class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                <!-- Stat blocks will be inserted here -->
-                            </div>
-                        </div>
-                        <div>
-                            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Portal Distribution</h2>
-                            <canvas id="portalChart"></canvas>
-                        </div>
+            <div class="card space-y-6">
+                <div>
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Statistics</h2>
+                    <div id="stats-container" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <!-- Stat blocks will be inserted here -->
                     </div>
                 </div>
+            </div>
 
-                <div class="lg:col-span-1 card">
-                    <div class="mb-2">
-                        <div class="flex items-center justify-between mb-3">
-                            <h2 class="text-2xl font-semibold text-gray-800">My Applications</h2>
-                            <div class="flex items-center gap-2">
-                                <button id="open-sheet-btn" class="btn btn-outline btn-eq">Open Sheet</button>
-                                <div class="relative">
-                                    <button id="export-btn" class="btn btn-secondary btn-eq">Export</button>
-                                    <div id="export-menu"
-                                        class="absolute right-0 mt-2 w-40 bg-white border rounded shadow-md hidden z-20">
-                                        <button id="export-csv"
-                                            class="w-full text-left px-3 py-2 hover:bg-gray-100">Export CSV</button>
-                                        <button id="export-xlsx"
-                                            class="w-full text-left px-3 py-2 hover:bg-gray-100">Export XLSX</button>
-                                    </div>
+            <div class="card">
+                <div class="mb-2">
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-2xl font-semibold text-gray-800">My Applications</h2>
+                        <div class="flex items-center gap-2">
+                            <button id="open-sheet-btn" class="btn btn-outline btn-eq">Open Sheet</button>
+                            <div class="relative">
+                                <button id="export-btn" class="btn btn-secondary btn-eq">Export</button>
+                                <div id="export-menu"
+                                    class="absolute right-0 mt-2 w-40 bg-white border rounded shadow-md hidden z-20">
+                                    <button id="export-csv"
+                                        class="w-full text-left px-3 py-2 hover:bg-gray-100">Export CSV</button>
+                                    <button id="export-xlsx"
+                                        class="w-full text-left px-3 py-2 hover:bg-gray-100">Export XLSX</button>
                                 </div>
                             </div>
                         </div>
-                        <div class="relative w-full">
-                            <input type="search" id="search-bar" placeholder="Search..." class="w-full pl-4 pr-10">
-                            <button id="refresh-button"
-                                class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-indigo-600">
-                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.885-.666A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </button>
-                        </div>
                     </div>
-                    <div id="loader" class="text-center p-8">
-                        <p class="text-gray-600">Loading data...</p>
-                    </div>
-                    <div id="jobs-list-container" class="space-y-2">
-                        <!-- Job cards will be inserted here by JavaScript -->
+                    <div class="relative w-full">
+                        <input type="search" id="search-bar" placeholder="Search..." class="w-full pl-4 pr-10">
+                        <button id="refresh-button"
+                            class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-indigo-600">
+                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.885-.666A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
+                <div id="loader" class="text-center p-8">
+                    <p class="text-gray-600">Loading data...</p>
+                </div>
+                <div id="jobs-list-container" class="space-y-2">
+                    <!-- Job cards will be inserted here by JavaScript -->
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Application Breakdown</h2>
+                <canvas id="portalChart"></canvas>
             </div>
 
             <div class="card">
