@@ -610,7 +610,9 @@ addJobForm.addEventListener('submit', async (e) => {
     const date = document.getElementById('applicationDate').value;
     const portal = document.getElementById('jobPortal').value;
     const status = document.getElementById('jobStatus').value;
-    const updated = new Date().toISOString().split('T')[0];
+    // Use local date to avoid timezone issues
+    const nowLocal = new Date();
+    const updated = `${nowLocal.getFullYear()}-${String(nowLocal.getMonth() + 1).padStart(2, '0')}-${String(nowLocal.getDate()).padStart(2, '0')}`;
 
     const newRow = [jobName, company, date, portal, status, updated];
 
@@ -686,7 +688,9 @@ async function deleteJob(rowIndex) {
 async function updateJobStatus(rowIndex, newStatus) {
     const range = `Sheet1!E${rowIndex}`; // Column E is Status
     const updatedDateRange = `Sheet1!F${rowIndex}`; // Column F is Updated Date
-    const today = new Date().toISOString().split('T')[0];
+    // Use local date to avoid timezone issues
+    const nowLocal = new Date();
+    const today = `${nowLocal.getFullYear()}-${String(nowLocal.getMonth() + 1).padStart(2, '0')}-${String(nowLocal.getDate()).padStart(2, '0')}`;
 
     try {
         await gapi.client.sheets.spreadsheets.values.update({
