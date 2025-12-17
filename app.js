@@ -121,6 +121,8 @@ async function fetchAndRenderJobs() {
         const range = response.result;
         if (range.values && range.values.length > 1) {
             allJobsData = range.values.slice(1).map((row, index) => [...row, index + 2]);
+            console.log('Loaded applications:', allJobsData.length);
+            console.log('Sample dates from sheet:', allJobsData.slice(0, 5).map(r => r[2]));
         } else {
             allJobsData = [];
         }
@@ -406,15 +408,17 @@ function updateCharts(jobs) {
         portalCounts[portal] = (portalCounts[portal] || 0) + 1;
     });
 
-    // Render Stats Cards
-    const totalApps = jobs.length;
-    const activeApps = jobs.filter(j => j[4] !== 'Rejected').length;
-    const interviews = jobs.filter(j => j[4] === 'Interviewed').length;
-    const offers = jobs.filter(j => j[4] === 'Offer').length;
-    const rejected = jobs.filter(j => j[4] === 'Rejected').length;
+    // Render Stats Cards - Use allJobsData for accurate counts
+    const totalApps = allJobsData.length;
+    const activeApps = allJobsData.filter(j => j[4] !== 'Rejected').length;
+    const interviews = allJobsData.filter(j => j[4] === 'Interviewed').length;
+    const offers = allJobsData.filter(j => j[4] === 'Offer').length;
+    const rejected = allJobsData.filter(j => j[4] === 'Rejected').length;
 
     // Calculate daily applications count
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    console.log('Today is:', today);
+    console.log('Checking dates from all applications...');
     const todayApps = allJobsData.filter(j => {
         const dateStr = j[2]; // Application date is at index 2
         if (dateStr) {
@@ -422,11 +426,19 @@ function updateCharts(jobs) {
             const d = new Date(dateStr);
             if (!isNaN(d.getTime())) {
                 const appDate = d.toISOString().split('T')[0];
-                return appDate === today;
+                if (appDate === today) {
+                    console.log('✓ MATCH - Job:', j[0], '| Raw date:', dateStr, '| Parsed:', appDate);
+                    return true;
+                }
+            } else {
+                console.log('✗ Invalid date for job:', j[0], '| Raw date:', dateStr);
             }
         }
         return false;
     }).length;
+    console.log('==================');
+    console.log('Total apps today:', todayApps);
+    console.log('==================');
 
     const statsContainer = document.getElementById('stats-container');
     statsContainer.innerHTML = `
