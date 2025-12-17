@@ -415,23 +415,28 @@ function updateCharts(jobs) {
     const offers = allJobsData.filter(j => j[4] === 'Offer').length;
     const rejected = allJobsData.filter(j => j[4] === 'Rejected').length;
 
-    // Calculate daily applications count
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    // Calculate daily applications count - use local date to avoid timezone issues
+    const nowLocal = new Date();
+    const today = `${nowLocal.getFullYear()}-${String(nowLocal.getMonth() + 1).padStart(2, '0')}-${String(nowLocal.getDate()).padStart(2, '0')}`;
     console.log('Today is:', today);
     console.log('Checking dates from all applications...');
     const todayApps = allJobsData.filter(j => {
         const dateStr = j[2]; // Application date is at index 2
         if (dateStr) {
-            // Handle various date formats (YYYY-MM-DD or MM/DD/YYYY or YYYY/MM/DD)
-            const d = new Date(dateStr);
+            // Normalize date string to YYYY-MM-DD format
+            const normalized = dateStr.trim();
+            if (normalized === today) {
+                console.log('✓ MATCH - Job:', j[0], '| Date:', dateStr);
+                return true;
+            }
+            // Also try parsing if format is different
+            const d = new Date(normalized + 'T00:00:00');
             if (!isNaN(d.getTime())) {
-                const appDate = d.toISOString().split('T')[0];
+                const appDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
                 if (appDate === today) {
-                    console.log('✓ MATCH - Job:', j[0], '| Raw date:', dateStr, '| Parsed:', appDate);
+                    console.log('✓ MATCH (parsed) - Job:', j[0], '| Raw:', dateStr, '| Parsed:', appDate);
                     return true;
                 }
-            } else {
-                console.log('✗ Invalid date for job:', j[0], '| Raw date:', dateStr);
             }
         }
         return false;
@@ -476,9 +481,10 @@ function updateCharts(jobs) {
         // Use application date for timeline - this tracks when you applied
         const dateStr = job[2];
         if (dateStr) {
-            const d = new Date(dateStr);
-            if (!isNaN(d.getTime())) {
-                const key = d.toISOString().split('T')[0]; // YYYY-MM-DD
+            // Try direct string match first (YYYY-MM-DD format)
+            let key = dateStr.trim();
+            // Validate it's a proper date format
+            if (/^\d{4}-\d{2}-\d{2}$/.test(key)) {
                 const status = job[4] || 'Unknown';
                 
                 // Count by status per day
@@ -487,6 +493,17 @@ function updateCharts(jobs) {
 
                 // Count cumulative
                 dailyCumulative[key] = (dailyCumulative[key] || 0) + 1;
+            } else {
+                // Try parsing other date formats
+                const d = new Date(dateStr + 'T00:00:00');
+                if (!isNaN(d.getTime())) {
+                    key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                    const status = job[4] || 'Unknown';
+                    
+                    if (!dailyByStatus[key]) dailyByStatus[key] = {};
+                    dailyByStatus[key][status] = (dailyByStatus[key][status] || 0) + 1;
+                    dailyCumulative[key] = (dailyCumulative[key] || 0) + 1;
+                }
             }
         }
     });
