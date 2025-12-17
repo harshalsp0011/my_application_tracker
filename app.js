@@ -415,11 +415,15 @@ function updateCharts(jobs) {
 
     // Calculate daily applications count
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-    const todayApps = jobs.filter(j => {
+    const todayApps = allJobsData.filter(j => {
         const dateStr = j[2]; // Application date is at index 2
         if (dateStr) {
-            const d = new Date(dateStr).toISOString().split('T')[0];
-            return d === today;
+            // Handle various date formats (YYYY-MM-DD or MM/DD/YYYY or YYYY/MM/DD)
+            const d = new Date(dateStr);
+            if (!isNaN(d.getTime())) {
+                const appDate = d.toISOString().split('T')[0];
+                return appDate === today;
+            }
         }
         return false;
     }).length;
@@ -456,19 +460,22 @@ function updateCharts(jobs) {
     const dailyByStatus = {};
     const dailyCumulative = {};
 
-    jobs.forEach(job => {
+    allJobsData.forEach(job => {
+        // Use application date for timeline - this tracks when you applied
         const dateStr = job[2];
         if (dateStr) {
             const d = new Date(dateStr);
-            const key = d.toISOString().split('T')[0]; // YYYY-MM-DD
-            const status = job[4] || 'Unknown';
-            
-            // Count by status per day
-            if (!dailyByStatus[key]) dailyByStatus[key] = {};
-            dailyByStatus[key][status] = (dailyByStatus[key][status] || 0) + 1;
+            if (!isNaN(d.getTime())) {
+                const key = d.toISOString().split('T')[0]; // YYYY-MM-DD
+                const status = job[4] || 'Unknown';
+                
+                // Count by status per day
+                if (!dailyByStatus[key]) dailyByStatus[key] = {};
+                dailyByStatus[key][status] = (dailyByStatus[key][status] || 0) + 1;
 
-            // Count cumulative
-            dailyCumulative[key] = (dailyCumulative[key] || 0) + 1;
+                // Count cumulative
+                dailyCumulative[key] = (dailyCumulative[key] || 0) + 1;
+            }
         }
     });
 
