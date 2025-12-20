@@ -415,18 +415,18 @@ function updateCharts(jobs) {
     const offers = allJobsData.filter(j => j[4] === 'Offer').length;
     const rejected = allJobsData.filter(j => j[4] === 'Rejected').length;
 
-    // Calculate daily applications count - use local date to avoid timezone issues
+    // Calculate daily applications count based on APPLIED DATE - use local date to avoid timezone issues
     const nowLocal = new Date();
     const today = `${nowLocal.getFullYear()}-${String(nowLocal.getMonth() + 1).padStart(2, '0')}-${String(nowLocal.getDate()).padStart(2, '0')}`;
     console.log('Today is:', today);
-    console.log('Checking dates from all applications...');
+    console.log('Checking APPLIED dates from all applications...');
     const todayApps = allJobsData.filter(j => {
-        const dateStr = j[2]; // Application date is at index 2
-        if (dateStr) {
+        const appliedDateStr = j[2]; // Applied Date is at column C / index 2
+        if (appliedDateStr) {
             // Normalize date string to YYYY-MM-DD format
-            const normalized = dateStr.trim();
+            const normalized = appliedDateStr.trim();
             if (normalized === today) {
-                console.log('✓ MATCH - Job:', j[0], '| Date:', dateStr);
+                console.log('✓ MATCH - Job:', j[0], '| Applied Date:', appliedDateStr);
                 return true;
             }
             // Also try parsing if format is different
@@ -434,7 +434,7 @@ function updateCharts(jobs) {
             if (!isNaN(d.getTime())) {
                 const appDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
                 if (appDate === today) {
-                    console.log('✓ MATCH (parsed) - Job:', j[0], '| Raw:', dateStr, '| Parsed:', appDate);
+                    console.log('✓ MATCH (parsed) - Job:', j[0], '| Raw Applied Date:', appliedDateStr, '| Parsed:', appDate);
                     return true;
                 }
             }
