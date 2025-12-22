@@ -473,20 +473,21 @@ function updateCharts(jobs) {
         </div>
     `;
 
-    // Render Timeline Chart - Show applications by Applied Date
+    // Render Timeline Chart - Hybrid approach for accurate tracking
     const dailyByStatus = {};
     const dailyCumulative = {};
 
     allJobsData.forEach(job => {
-        // Use Applied Date (column C/index 2) to match the "Today" stat card
-        const dateStr = job[2]; // Use Applied Date
+        const status = job[4] || 'Unknown';
+        // For "Applied" status: use Applied Date (when it was submitted)
+        // For other statuses: use Last Updated Date (when status changed)
+        const dateStr = status === 'Applied' ? job[2] : (job[5] || job[2]);
+        
         if (dateStr) {
             // Try direct string match first (YYYY-MM-DD format)
             let key = dateStr.trim();
             // Validate it's a proper date format
             if (/^\d{4}-\d{2}-\d{2}$/.test(key)) {
-                const status = job[4] || 'Unknown';
-                
                 // Count by status per day
                 if (!dailyByStatus[key]) dailyByStatus[key] = {};
                 dailyByStatus[key][status] = (dailyByStatus[key][status] || 0) + 1;
@@ -498,7 +499,6 @@ function updateCharts(jobs) {
                 const d = new Date(dateStr + 'T00:00:00');
                 if (!isNaN(d.getTime())) {
                     key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-                    const status = job[4] || 'Unknown';
                     
                     if (!dailyByStatus[key]) dailyByStatus[key] = {};
                     dailyByStatus[key][status] = (dailyByStatus[key][status] || 0) + 1;
