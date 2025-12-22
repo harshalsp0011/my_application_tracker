@@ -473,13 +473,13 @@ function updateCharts(jobs) {
         </div>
     `;
 
-    // Render Timeline Chart - Show applications by last activity date (updates)
+    // Render Timeline Chart - Show applications by Applied Date
     const dailyByStatus = {};
     const dailyCumulative = {};
 
     allJobsData.forEach(job => {
-        // Use Last Updated date (column F/index 5) to track status changes and activity
-        const dateStr = job[5] || job[2]; // Use Last Updated, fallback to Application date
+        // Use Applied Date (column C/index 2) to match the "Today" stat card
+        const dateStr = job[2]; // Use Applied Date
         if (dateStr) {
             // Try direct string match first (YYYY-MM-DD format)
             let key = dateStr.trim();
