@@ -41,9 +41,9 @@
             <button id="authorize_button" class="btn btn-primary">Sign In with Google</button>
         </div>
 
-        <main id="main-content" style="display: none;" class="space-y-6">
-
-            <div class="card add-job-card">
+        <main id="main-content" style="display: none;">
+            <!-- Add New Application Card -->
+            <div class="card add-job-card bg-white shadow-lg rounded-lg border border-gray-200 mb-8 p-6 mb-10">
                 <div class="flex items-center justify-between mb-3">
                     <h2 class="text-2xl font-semibold text-gray-800">
                         <svg class="inline h-6 w-6 mr-2 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -53,9 +53,6 @@
                         </svg>
                         Add New Application
                     </h2>
-                    <div>
-                        <button id="toggle-form-btn" type="button" class="btn btn-outline btn-eq">Collapse</button>
-                    </div>
                 </div>
                 <form id="add-job-form">
                     <div id="add-job-form-body" class="form-expanded">
@@ -153,7 +150,8 @@
                 </form>
             </div>
 
-            <div class="card space-y-6">
+            <!-- Statistics Card -->
+            <div class="card bg-white shadow-lg rounded-lg border border-gray-200 mb-8 p-6 mt-2">
                 <div>
                     <h2 class="text-2xl font-semibold text-gray-800 mb-4">Statistics</h2>
                     <div id="stats-container" class="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -162,7 +160,8 @@
                 </div>
             </div>
 
-            <div class="card">
+            <!-- My Applications Card -->
+            <div class="card bg-white shadow-lg rounded-lg border border-gray-200 mb-8 p-6">
                 <div class="mb-2">
                     <div class="flex items-center justify-between mb-3">
                         <h2 class="text-2xl font-semibold text-gray-800">My Applications</h2>
@@ -201,10 +200,12 @@
                 </div>
             </div>
 
-            <div class="card">
+            <!-- Timeline Card -->
+            <div class="card bg-white shadow-lg rounded-lg border border-gray-200 mb-8 p-6">
                 <h2 class="text-2xl font-semibold text-gray-800 mb-4">Application Timeline & Daily Breakdown</h2>
                 <canvas id="timelineChart"></canvas>
             </div>
+        </main>
         </main>
     </div>
 

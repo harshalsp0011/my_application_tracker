@@ -51,12 +51,20 @@ body {
 }
 
 /* Styling for Add New Application card */
+
 .add-job-card {
     background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
     border: 1px solid rgba(99,102,241,0.06);
     padding: 1.25rem;
-    margin-bottom: 1rem;
+    margin-bottom: 2.5rem; /* 40px for clear separation */
     box-shadow: 0 12px 30px rgba(15,23,42,0.06);
+}
+
+.mt-2 {
+    margin-top: 0.5rem !important;
+}
+.mb-10 {
+    margin-bottom: 2.5rem !important;
 }
 .add-job-card h2 {
     display: inline-block;

@@ -211,20 +211,7 @@ function setupAutocomplete(inputId, datalistId, suggestionsId) {
     });
 }
 
-// Toggle collapse/expand of the Add Job form
-document.getElementById('toggle-form-btn').addEventListener('click', () => {
-    const body = document.getElementById('add-job-form-body');
-    const btn = document.getElementById('toggle-form-btn');
-    if (body.classList.contains('form-expanded')) {
-        body.classList.remove('form-expanded');
-        body.classList.add('form-collapsed');
-        btn.textContent = 'Expand';
-    } else {
-        body.classList.remove('form-collapsed');
-        body.classList.add('form-expanded');
-        btn.textContent = 'Collapse';
-    }
-});
+
 
 // Initialize autocompletes after datalists are populated
 const initAutocompletes = () => {
