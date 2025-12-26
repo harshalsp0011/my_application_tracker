@@ -42,8 +42,8 @@
         </div>
 
         <main id="main-content" style="display: none;">
-            <!-- Add New Application Card -->
-            <div class="card add-job-card bg-white shadow-lg rounded-lg border border-gray-200 mb-8 p-6 mb-10">
+            <!-- Add New Application Card Component -->
+            <section id="add-application-card" class="card add-job-card border border-gray-300 shadow-md p-6 mb-8">
                 <div class="flex items-center justify-between mb-3">
                     <h2 class="text-2xl font-semibold text-gray-800">
                         <svg class="inline h-6 w-6 mr-2 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -150,18 +150,24 @@
                 </form>
             </div>
 
-            <!-- Statistics Card -->
-            <div class="card bg-white shadow-lg rounded-lg border border-gray-200 mb-8 p-6 mt-2">
-                <div>
-                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Statistics</h2>
-                    <div id="stats-container" class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <!-- Stat blocks will be inserted here -->
-                    </div>
+
+            <!-- Statistics Card Component: moved outside main-content -->
+        </main>
+
+        <section id="statistics-card-section" style="display: none;">
+            <div class="card bg-white border border-gray-300 shadow-md p-6 mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Statistics</h2>
+                <div id="stats-container" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <!-- Stat blocks will be inserted here -->
                 </div>
             </div>
+        </section>
 
-            <!-- My Applications Card -->
-            <div class="card bg-white shadow-lg rounded-lg border border-gray-200 mb-8 p-6">
+            <!-- Applications List Card Component: moved outside main-content -->
+        </main>
+
+        <section id="applications-list-card-section" style="display: none;">
+            <div class="card bg-white border border-gray-300 shadow-md p-6 mb-8">
                 <div class="mb-2">
                     <div class="flex items-center justify-between mb-3">
                         <h2 class="text-2xl font-semibold text-gray-800">My Applications</h2>
@@ -199,12 +205,17 @@
                     <!-- Job cards will be inserted here by JavaScript -->
                 </div>
             </div>
+        </section>
 
-            <!-- Timeline Card -->
-            <div class="card bg-white shadow-lg rounded-lg border border-gray-200 mb-8 p-6">
+        </main>
+
+        <!-- Timeline & Daily Breakdown Card: Separate, below all cards, only after login -->
+        <section id="timeline-card-section" style="display: none;">
+            <div class="card bg-white border border-gray-300 shadow-md p-6 mb-8">
                 <h2 class="text-2xl font-semibold text-gray-800 mb-4">Application Timeline & Daily Breakdown</h2>
                 <canvas id="timelineChart"></canvas>
             </div>
+        </section>
         </main>
         </main>
     </div>

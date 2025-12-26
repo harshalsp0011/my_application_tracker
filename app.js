@@ -79,14 +79,23 @@ function handleSignoutClick() {
 }
 
 function updateSigninStatus(isSignedIn) {
+    const timelineSection = document.getElementById('timeline-card-section');
+    const applicationsSection = document.getElementById('applications-list-card-section');
+    const statisticsSection = document.getElementById('statistics-card-section');
     if (isSignedIn) {
         authCard.style.display = 'none';
         userProfileDiv.style.display = 'flex';
         mainContent.style.display = 'block';
+        if (timelineSection) timelineSection.style.display = 'block';
+        if (applicationsSection) applicationsSection.style.display = 'block';
+        if (statisticsSection) statisticsSection.style.display = 'block';
     } else {
         authCard.style.display = 'block';
         userProfileDiv.style.display = 'none';
         mainContent.style.display = 'none';
+        if (timelineSection) timelineSection.style.display = 'none';
+        if (applicationsSection) applicationsSection.style.display = 'none';
+        if (statisticsSection) statisticsSection.style.display = 'none';
     }
 }
 
